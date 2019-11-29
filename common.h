@@ -1,6 +1,18 @@
 #pragma once
-#include<iostream>
-using namespace std;
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <sys/file.h>  
+#include <sys/stat.h> 
+#include <netinet/in.h>
+#include <sys/errno.h>
+#include <
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
 #define MAX_SEQ 9999 //共享文件名数字
@@ -63,6 +75,8 @@ void stop_timer(seq_nr k);
 void start_ack_timer(void);	
 /*停止确认包定时器*/
 void stop_ack_timer(void);
+/*对定时器进行维护*/
+void timer_keep(void)
 /*解除网络层阻塞,使可以产生新的network_layer_ready事件*/
 void enable_network_layer(void);
 /*使网络层阻塞,不再产生新的network_layer_ready事件*/
@@ -71,3 +85,165 @@ void disable_network_layer(void);
 #define inc(k) if(k<MAX_SEQ) k=k+1; else k=1;
 /*文件锁设置*/
 int set_lock(int fd,int type) 
+
+
+void sysLocalTime() 
+{ 
+    time_t             timesec; 
+    struct tm         *p; 
+    time(×ec); 
+    p = localtime(×ec); 
+    printf("%d%d%d%d%d%d\n", 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec); 
+       
+} 
+   
+void sysUsecTime() 
+{ 
+    struct timeval    tv; 
+    struct timezone tz; 
+    struct tm         *p; 
+    gettimeofday(&tv, &tz); 
+    printf("tv_sec:%ld\n",tv.tv_sec); 
+    printf("tv_usec:%ld\n",tv.tv_usec); 
+    printf("tz_minuteswest:%d\n",tz.tz_minuteswest); 
+    printf("tz_dsttime:%d\n",tz.tz_dsttime); 
+       
+    p = localtime(&tv.tv_sec); 
+    printf("time_now:%d%d%d%d%d%d.%ld\n", 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, tv.tv_usec); 
+} 
+
+//-----------------------------链表实现---------------------------
+#define OK           1
+#define ERROR        0
+#define INFEASIBLE  -1
+#define OVERFLOW	  -1
+
+typedef int Status;
+
+typedef int ElemType;	//可根据需要修改元素的类型
+
+typedef struct LNode {
+	ElemType      time;	//定时器超时时间
+	struct LNode *next;	//存放直接后继的指针
+} LNode, *LinkList;
+
+
+
+//获取链表长度
+int ListLength(LinkList L) {
+	LinkList p = L->next;
+	int len = 0;
+	if (p == NULL)return 0;
+	while (p!=L) {
+		p = p->next;
+		len++;
+	}
+	return len;
+}
+
+
+//在i处插入节点e，从1开始计数
+Status ListInsert(LinkList &L, int i, ElemType e) {
+	LinkList s, p = L;
+	int pos = 0;
+	while (p&&pos < i - 1) {
+		p = p->next;
+		pos++;
+	}
+	if (p == NULL || pos > i - 1)return ERROR;
+	s = (LinkList)malloc(sizeof(LNode));
+	if (s == NULL)return OVERFLOW;
+	s->data = e;
+	s->next = p->next;
+	p->next = s;
+	return OK;
+}
+
+//在尾处插入节点e
+Status Listadd(LinkList &L, ElemType e) {
+	LinkList s, p = L;
+	while (p->next) {
+		p = p->next;
+		pos++;
+	}
+	if (p == NULL )return ERROR;
+	s = (LinkList)malloc(sizeof(LNode));
+	if (s == NULL)return OVERFLOW;
+	s->data = e;
+	s->next = p->next;
+	p->next = s;
+	return OK;
+}
+
+//在插入节点e,按从小到大排列
+Status ListInsert_order(LinkList &L, ElemType e) {
+	LinkList s, p = L;
+	int pos = 0;
+	while (p->next) {
+		if (e <= p->next->data)break;
+		p = p->next;
+	}
+	s = (LinkList)malloc(sizeof(LNode));
+	if (s == NULL)return OVERFLOW;
+	s->data = e;
+	s->next = p->next;
+	p->next = s;
+	return OK;
+}
+
+
+//创建一个新链表（带头结点）
+int create_L(LinkList &L)
+{
+	LinkList p;
+	int i, n = 1, m;
+	L = (LNode *)malloc(sizeof(LNode));
+	if (L == NULL)exit(OVERFLOW);
+	(L)->next = NULL;
+	return OK;
+}
+
+//销毁链表
+int destroy_L(LinkList &L)
+{
+	LinkList q, p = L;
+	//从头结点开始一次释放
+	while (p) {
+		q = p->next;
+		free(p);
+		p = q;
+	}
+	L = NULL;
+	return OK;
+}
+
+
+//在i处删除节点e，从1开始计数
+Status Listdelete(LinkList L, int i, ElemType &e) {
+	LinkList q, p = L;
+	int pos = 0;
+	while (p->next&&pos < i - 1) {
+		p = p->next;
+		pos++;
+	}
+	if (p->next == NULL || pos > i - 1)return ERROR;
+	q = p->next;
+	e = q->data;
+	p->next = q->next;
+	free(q);
+	return OK;
+}
+
+//寻找值e的位置i，从1开始计数
+Status List_find(LinkList L, int &i, ElemType e) {
+	LinkList q, p = L->next;
+	int pos = 0, len = ListLength(L);
+	while (p) {
+		if (p->data == e)break;
+		p = p->next;
+		pos++;
+	}
+	if (p == NULL)return ERROR;
+	i = pos + 1;
+	return OK;
+}
