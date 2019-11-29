@@ -62,6 +62,39 @@ void from_physical_layer(packet* p);
 void to_physical_layer(frame *s);			
 
 /*------------------------------------------冕------------------------------------------*/
+static event_type e;
+
+static void TIMEOUT()
+{
+	e = timeout;
+}
+
+static void CksumErr()
+{
+	e = cksum_err;
+}
+
+static void FrameArrival()
+{
+	e = frame_arrival;
+}
+
+static void NLReady()
+{
+	e = network_layer_ready;
+}
+
+static void wait_for_event(event_type* event)
+{
+	signal(SIGALRM, TIMEOUT);
+	signal(35, CksumErr);
+	signal(36, FrameArrival);
+	signal(37, NLReady);
+	pause();
+	*event = e;
+	return;
+}
+
 void enable_network_layer()
 {
 	char buf[128] = { 0 };
