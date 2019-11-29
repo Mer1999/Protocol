@@ -3,7 +3,7 @@
 using namespace std;
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
-#define 
+#define MAX_SEQ 9999 //共享文件名数字
 
 typedef enum {
 	false,		//false=0
