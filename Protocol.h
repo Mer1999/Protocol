@@ -1,62 +1,135 @@
 #pragma once
 #include<iostream>
 using namespace std;
-#define MAX_PKT 1024
+#define MAX_PKT 1024 //æ¯ä¸€å¸§æœ€å¤§å®¹é‡
+#define MAX_FILE_LEN 128 //æœ€å¤§å…±äº«æ–‡ä»¶åé•¿åº¦
+#define 
 
 typedef enum {
-	FALSE,
-	TRUE
+	false,		//false=0
+	true		//true=1
 } boolean;
 
-typedef unsigned int seq_nr;
+typedef unsigned int seq_nr;//å‘é€åºå·
 
-/*Êı¾İ°ü£¬´¿Êı¾İ*/
+/*æ•°æ®åŒ…ï¼Œçº¯æ•°æ®*/
 typedef struct {
 	unsigned char data[MAX_PKT];
 } packet; 
 
- /*Ö¡ÀàĞÍÃ¶¾ÙÁ¿*/
+ /*å¸§ç±»å‹æšä¸¾é‡*/
 typedef enum {
-	data, //Êı¾İ°ü 
-	ack, //È·ÈÏ°ü 
-	nak //·ñ¶¨È·ÈÏ°ü
+	data, //æ•°æ®åŒ… 
+	ack, //ç¡®è®¤åŒ… 
+	nak //å¦å®šç¡®è®¤åŒ…
 } frame_kind;
 
-/*Ö¡½á¹¹*/
+/*å¸§ç»“æ„*/
 typedef struct {
-	frame_kind kind;	//Ö¡ÀàĞÍ 
-	seq_nr seq;			//·¢ËÍĞòºÅ 
-	seq_nr ack;			//½ÓÊÕĞòºÅ 
-	packet info;			//Êı¾İ°ü
+	frame_kind kind;	    //å¸§ç±»å‹ 
+	seq_nr seq;			    //å‘é€åºå· 
+	seq_nr ack;			    //æ¥æ”¶åºå· 
+	packet info;			//æ•°æ®åŒ…
 } frame; 
 
-/*ÊÂ¼şÀàĞÍÃ¶¾ÙÁ¿*/
+/*äº‹ä»¶ç±»å‹æšä¸¾é‡*/
 typedef enum {
-	frame_arrival,				//Ö¡µ½´ï
-	cksum_err,					//¼ìÑéºÍ´í
-	timeout,						//·¢ËÍ³¬Ê±
-	network_layer_ready,	//ÍøÂç²ã¾ÍĞ÷ 
-	ack_timeout					//È·ÈÏ°ü³¬Ê±
+	frame_arrival,			//å¸§åˆ°è¾¾
+	cksum_err,				//æ£€éªŒå’Œé”™
+	timeout,				//å‘é€è¶…æ—¶
+	network_layer_ready,	//ç½‘ç»œå±‚å°±ç»ª 
+	ack_timeout				//ç¡®è®¤åŒ…è¶…æ—¶
 } event_type; 
 
-void wait_for_event(event_type* event);				//×èÈûº¯Êı£¬µÈ´ıÊÂ¼ş·¢Éú
-void from_network_layer(packet* p);					//·¢ËÍ·½´ÓÍøÂç²ãµÃµ½´¿Êı¾İ°ü
-void to_network_layer(packet* p);						//½ÓÊÕ·½ÏòÍøÂç²ã·¢ËÍ´¿Êı¾İ°ü 
-																			//È¥µôÖ¡µÄÀàĞÍ¡¢·¢ËÍ/È·ÈÏĞòºÅµÈ¿ØÖÆĞÅÏ¢
-void from_physical_layer(packet* p);					//½ÓÊÕ·½´ÓÎïÀí²ãÈ¡µÃÖ¡
-																			//Ö¡Í·Î²µÄFLAG×Ö½Ú¡¢Êı¾İÖĞµÄ×Ö½ÚÌî³ä¾ùÒÑÈ¥µô 
-																			//µ÷ÓÃ±¾º¯ÊıÇ°ÒÑÑéÖ¤¹ıĞ£ÑéºÍ£¬Èô·¢Éú´íÎó Ôò·¢ËÍcksum_errÊÂ¼ş£¬Òò´ËÖ»ÓĞÖ¡ÕıÈ·µÄ Çé¿öÏÂ»áµ÷ÓÃ±¾º¯Êı
-void to_physical_layer(packet* p);						//·¢ËÍ·½ÏòÎïÀí²ã·¢ËÍÖ¡
-																			//Ö¡Í·Î²¼ÓFLAG×Ö½Ú¡¢Êı¾İÖĞ½øĞĞ×Ö½ÚÌî³ä 
-																			//¼ÆËãĞ£ÑéºÍ·ÅÈëÖ¡Î²
-void start_timer(seq_nr k);									//Æô¶¯µÚkÖ¡µÄ¶¨Ê±Æ÷
-void stop_timer(seq_nr k);									//Í£Ö¹µÚkÖ¡µÄ¶¨Ê±Æ÷
-void start_ack_timer(void);									//Æô¶¯È·ÈÏ°ü¶¨Ê±Æ÷
-void stop_ack_timer(void);									//Í£Ö¹È·ÈÏ°ü¶¨Ê±Æ÷
-void enable_network_layer(void);						//½â³ıÍøÂç²ã×èÈû
-																			//Ê¹¿ÉÒÔ²úÉúĞÂµÄnetwork_layer_readyÊÂ¼ş
-void disable_network_layer(void);						//Ê¹ÍøÂç²ã×èÈû
-																			//²»ÔÙ²úÉúĞÂµÄnetwork_layer_readyÊÂ¼ş
+/*é˜»å¡å‡½æ•°ï¼Œç­‰å¾…äº‹ä»¶å‘ç”Ÿ*/
+void wait_for_event(event_type* event);		
+/*å‘é€æ–¹ä»ç½‘ç»œå±‚å¾—åˆ°çº¯æ•°æ®åŒ…*/
+void from_network_layer(packet* p);		
+/*æ¥æ”¶æ–¹å‘ç½‘ç»œå±‚å‘é€çº¯æ•°æ®åŒ…,å»æ‰å¸§çš„ç±»å‹ã€å‘é€/ç¡®è®¤åºå·ç­‰æ§åˆ¶ä¿¡æ¯*/	
+void to_network_layer(packet* p);	
+/*æ¥æ”¶æ–¹ä»ç‰©ç†å±‚å–å¾—å¸§ï¼Œå¸§å¤´å°¾çš„FLAGå­—èŠ‚ã€æ•°æ®ä¸­çš„å­—èŠ‚å¡«å……å‡å·²å»æ‰
+è°ƒç”¨æœ¬å‡½æ•°å‰å·²éªŒè¯è¿‡æ ¡éªŒå’Œï¼Œè‹¥å‘ç”Ÿé”™è¯¯,åˆ™å‘é€cksum_erräº‹ä»¶
+å› æ­¤åªæœ‰å¸§æ­£ç¡®çš„æƒ…å†µä¸‹ä¼šè°ƒç”¨æœ¬å‡½æ•°*/		
+void from_physical_layer(packet* p);		
+/*å‘é€æ–¹å‘ç‰©ç†å±‚å‘é€å¸§,å¸§å¤´å°¾åŠ FLAGå­—èŠ‚ã€æ•°æ®ä¸­è¿›è¡Œå­—èŠ‚å¡«å……,è®¡ç®—æ ¡éªŒå’Œæ”¾å…¥å¸§å°¾*/
+void to_physical_layer(frame* s);
+/*å¯åŠ¨ç¬¬kå¸§çš„å®šæ—¶å™¨*/
+void start_timer(seq_nr k);	
+/*åœæ­¢ç¬¬kå¸§çš„å®šæ—¶å™¨*/
+void stop_timer(seq_nr k);
+/*å¯åŠ¨ç¡®è®¤åŒ…å®šæ—¶å™¨*/
+void start_ack_timer(void);	
+/*åœæ­¢ç¡®è®¤åŒ…å®šæ—¶å™¨*/
+void stop_ack_timer(void);
+/*è§£é™¤ç½‘ç»œå±‚é˜»å¡,ä½¿å¯ä»¥äº§ç”Ÿæ–°çš„network_layer_readyäº‹ä»¶*/
+void enable_network_layer(void);
+/*ä½¿ç½‘ç»œå±‚é˜»å¡,ä¸å†äº§ç”Ÿæ–°çš„network_layer_readyäº‹ä»¶*/
+void disable_network_layer(void);
+#define inc(k) if(k<MAX_SEQ) k=k+1; else k=0; //ä½¿kåœ¨[0 ~ MAX_SEQ-1]é—´å¾ªç¯å¢é•¿,å¦‚æœMAX_SEQ=1ï¼Œåˆ™0/1äº’æ¢#pragma once
+#include<iostream>
+using namespace std;
+#define MAX_PKT 1024 //æ¯ä¸€å¸§æœ€å¤§å®¹é‡
+#define MAX_FILE_LEN 128 //æœ€å¤§å…±äº«æ–‡ä»¶åé•¿åº¦
+#define 
 
-#define inc(k) if(k<MAX_SEQ) k=k+1; else k=0; //Ê¹kÔÚ[0 ~ MAX_SEQ-1]¼äÑ­»·Ôö³¤ 
-																			//Èç¹ûMAX_SEQ=1£¬Ôò0/1»¥»»
+typedef enum {
+	false,		//false=0
+	true		//true=1
+} boolean;
+
+typedef unsigned int seq_nr;//å‘é€åºå·
+
+/*æ•°æ®åŒ…ï¼Œçº¯æ•°æ®*/
+typedef struct {
+	unsigned char data[MAX_PKT];
+} packet; 
+
+ /*å¸§ç±»å‹æšä¸¾é‡*/
+typedef enum {
+	data, //æ•°æ®åŒ… 
+	ack, //ç¡®è®¤åŒ… 
+	nak //å¦å®šç¡®è®¤åŒ…
+} frame_kind;
+
+/*å¸§ç»“æ„*/
+typedef struct {
+	frame_kind kind;	    //å¸§ç±»å‹ 
+	seq_nr seq;			    //å‘é€åºå· 
+	seq_nr ack;			    //æ¥æ”¶åºå· 
+	packet info;			//æ•°æ®åŒ…
+} frame; 
+
+/*äº‹ä»¶ç±»å‹æšä¸¾é‡*/
+typedef enum {
+	frame_arrival,			//å¸§åˆ°è¾¾
+	cksum_err,				//æ£€éªŒå’Œé”™
+	timeout,				//å‘é€è¶…æ—¶
+	network_layer_ready,	//ç½‘ç»œå±‚å°±ç»ª 
+	ack_timeout				//ç¡®è®¤åŒ…è¶…æ—¶
+} event_type; 
+
+/*é˜»å¡å‡½æ•°ï¼Œç­‰å¾…äº‹ä»¶å‘ç”Ÿ*/
+void wait_for_event(event_type* event);		
+/*å‘é€æ–¹ä»ç½‘ç»œå±‚å¾—åˆ°çº¯æ•°æ®åŒ…*/
+void from_network_layer(packet* p);		
+/*æ¥æ”¶æ–¹å‘ç½‘ç»œå±‚å‘é€çº¯æ•°æ®åŒ…,å»æ‰å¸§çš„ç±»å‹ã€å‘é€/ç¡®è®¤åºå·ç­‰æ§åˆ¶ä¿¡æ¯*/	
+void to_network_layer(packet* p);	
+/*æ¥æ”¶æ–¹ä»ç‰©ç†å±‚å–å¾—å¸§ï¼Œå¸§å¤´å°¾çš„FLAGå­—èŠ‚ã€æ•°æ®ä¸­çš„å­—èŠ‚å¡«å……å‡å·²å»æ‰
+è°ƒç”¨æœ¬å‡½æ•°å‰å·²éªŒè¯è¿‡æ ¡éªŒå’Œï¼Œè‹¥å‘ç”Ÿé”™è¯¯,åˆ™å‘é€cksum_erräº‹ä»¶
+å› æ­¤åªæœ‰å¸§æ­£ç¡®çš„æƒ…å†µä¸‹ä¼šè°ƒç”¨æœ¬å‡½æ•°*/		
+void from_physical_layer(packet* p);		
+/*å‘é€æ–¹å‘ç‰©ç†å±‚å‘é€å¸§,å¸§å¤´å°¾åŠ FLAGå­—èŠ‚ã€æ•°æ®ä¸­è¿›è¡Œå­—èŠ‚å¡«å……,è®¡ç®—æ ¡éªŒå’Œæ”¾å…¥å¸§å°¾*/
+void to_physical_layer(frame* s);
+/*å¯åŠ¨ç¬¬kå¸§çš„å®šæ—¶å™¨*/
+void start_timer(seq_nr k);	
+/*åœæ­¢ç¬¬kå¸§çš„å®šæ—¶å™¨*/
+void stop_timer(seq_nr k);
+/*å¯åŠ¨ç¡®è®¤åŒ…å®šæ—¶å™¨*/
+void start_ack_timer(void);	
+/*åœæ­¢ç¡®è®¤åŒ…å®šæ—¶å™¨*/
+void stop_ack_timer(void);
+/*è§£é™¤ç½‘ç»œå±‚é˜»å¡,ä½¿å¯ä»¥äº§ç”Ÿæ–°çš„network_layer_readyäº‹ä»¶*/
+void enable_network_layer(void);
+/*ä½¿ç½‘ç»œå±‚é˜»å¡,ä¸å†äº§ç”Ÿæ–°çš„network_layer_readyäº‹ä»¶*/
+void disable_network_layer(void);
+#define inc(k) if(k<MAX_SEQ) k=k+1; else k=0; //ä½¿kåœ¨[0 ~ MAX_SEQ-1]é—´å¾ªç¯å¢é•¿,å¦‚æœMAX_SEQ=1ï¼Œåˆ™0/1äº’æ¢
