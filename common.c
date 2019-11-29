@@ -36,7 +36,6 @@ void from_network_layer(packet* p)
 	char share_filename[seq_num];
 	sprintf(share_filename,"%s%04d",N_D_SHARE,seq_num);
 	inc(seq_num);
-	while()
 	fd=open(share_filename,O_RDONLY);
 	set_lock(fd,F_RDLCK);
 	read(share_file,p->data,MAX_PKT);
