@@ -4,6 +4,8 @@ using namespace std;
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
 #define MAX_SEQ 9999 //共享文件名数字
+#define N_D_SHARE "nerwork_datalink_share"
+#define D_N_SHARE "datalink_network_share"
 
 typedef enum {
 	false,		//false=0
@@ -65,5 +67,7 @@ void stop_ack_timer(void);
 void enable_network_layer(void);
 /*使网络层阻塞,不再产生新的network_layer_ready事件*/
 void disable_network_layer(void);
-/*使k在[0 ~ MAX_SEQ-1]间循环增长,如果MAX_SEQ=1，则0/1互换*/
+/*使k在[1 ~ MAX_SEQ-1]间循环增长,如果MAX_SEQ=1，则0/1互换*/
 #define inc(k) if(k<MAX_SEQ) k=k+1; else k=1;
+/*文件锁设置*/
+int set_lock(int fd,int type) 
