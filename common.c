@@ -66,4 +66,54 @@ void to_physical_layer(frame *s);
 
 
 /*------------------------------------------舟------------------------------------------*/
+//-----------------------------计时器-------------------------------
+LinkList timeL;//使用的链表
+int nowtime,nowusec;//现在是第几帧、第几毫秒
+struct timeval tv;//用于获取当前时间
 
+/*启动第k帧的定时器*/
+void start_timer(seq_nr k)
+{
+	if (k<nowtime)return;
+	Listadd(timeL,k-nowtime);
+}
+/*停止第k帧的定时器*/
+void stop_timer(seq_nr k)
+{
+	int pos=List_find(timeL,k),e;
+	Listdelete(timeL,pos,e);
+}
+/*启动确认包定时器*/
+void start_ack_timer(void)
+{
+
+}
+/*停止确认包定时器*/
+void stop_ack_timer(void)
+{
+
+}
+
+/*对定时器进行维护*/
+void timer_keep(void)
+{
+    gettimeofday(&tv);//获取当前时间
+	if (tv.tv_usec==nowusec)return;//触发毫秒时间中断
+	int n;
+	n=L->next->data;//获取当前第一个定时器的时间
+	n--;//时间减一
+	if (n==0)//计时器超时
+	{
+		Listdelete(timeL,1,e);//删除第一个计时器
+		//发送timeout事件，等待填入
+	}
+}
+
+/*定时器初始化，请在开始时使用*/
+void timer_create(void)
+{
+	nowtime=0;//初始化当前帧
+	
+    gettimeofday(&tv);//获取当前时间
+	nowusec=tv.tv_usec;//初始化当前时间
+}
