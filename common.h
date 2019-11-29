@@ -65,3 +65,5 @@ void stop_ack_timer(void);
 void enable_network_layer(void);
 /*使网络层阻塞,不再产生新的network_layer_ready事件*/
 void disable_network_layer(void);
+/*使k在[0 ~ MAX_SEQ-1]间循环增长,如果MAX_SEQ=1，则0/1互换*/
+#define inc(k) if(k<MAX_SEQ) k=k+1; else k=0;
