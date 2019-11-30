@@ -115,7 +115,8 @@ void disable_network_layer(void);
 /*文件锁设置*/
 int set_lock(int fd, int type);
 
-
+/*读取pid*/
+int FindPidByName(const char *pName);
 
 //链表
 #define OK           1
