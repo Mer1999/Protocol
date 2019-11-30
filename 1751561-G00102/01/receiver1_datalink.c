@@ -5,7 +5,6 @@ int main()
   frame r;
   event_type event;
   //物理层通知读文件的信号
-  extern int key_from_physical_layer_enable;
   signal(SIG_RECV_LINK_READ, key_from_physical_layer_enable);
   
   //死循环从物理层读文件，往网络层写文件
