@@ -141,6 +141,14 @@ void send_to_phy(frame *s,int sockfd)
 		write(sockfd, s, sizeof(frame));
 }
 
+/*物理层间接收*/
+int receive_from_phy(frame *s, int sockfd_server, int sockfd_client)
+{
+	int nlen = 0;
+	nlen = read(sockfd_client, *s, sizeof(frame));
+	return nlen;
+} 
+
 static event_type e;
 
 static void TIMEOUT()
