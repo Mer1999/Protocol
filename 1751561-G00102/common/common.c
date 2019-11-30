@@ -145,7 +145,7 @@ void send_to_phy(frame *s,int sockfd)
 int receive_from_phy(frame *s, int sockfd_server, int sockfd_client)
 {
 	int nlen = 0;
-	nlen = read(sockfd_client, *s, sizeof(frame));
+	nlen = read(sockfd_client, s, sizeof(frame));
 	return nlen;
 } 
 
