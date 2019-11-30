@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <sys/errno.h>
 #include <signal.h>
+#include <sys/prctl.h>
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
 #define MAX_SEQ 9999 //共享文件名数字
