@@ -20,5 +20,4 @@ common.o:
 clean:
 	rm -fr *.o
 	rm -fr $(TARGET)
-
-	
+	rm -fr network_datalink.share.*,datalink_network.share.*,datalink_physical.share.*,physical_datalink.share.*
