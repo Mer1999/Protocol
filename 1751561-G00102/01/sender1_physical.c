@@ -13,7 +13,7 @@ int main()
 {
 	prctl(PR_SET_NAME, "sender_physical");
 	/*注册信号处理函数*/
-	signal(SIG_PHY_READ, EnPhy);//可读信号到来
+	signal(SIG_SEND_PHY_READ, EnPhy);//可读信号到来
 
 	 frame s;
 
@@ -27,10 +27,10 @@ int main()
 	 }
 	 memset(&sock_addr, 0, sizeof(sock_addr));
 	 sock_addr.sin_family = AF_INET;
-	 serv_addr.sin_addr.s_addr = inet_addr(RIP);
-	 serv_addr.sin_port = htons(DEFAULT_PORT);
+	 sock_addr.sin_addr.s_addr = inet_addr(RIP);
+	 sock_addr.sin_port = htons(DEFAULT_PORT);
 
-	 while (connect(*sockfd, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
+	 while (connect(sockfd, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
 		 continue;
 	 }
 
