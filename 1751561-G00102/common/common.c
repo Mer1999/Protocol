@@ -122,7 +122,7 @@ void to_physical_layer(frame *s);
 void from_datalink_layer(frame *s)
 {
 	static int seq_PKT = 0;//使用静态局部变量
-	char share_file_name[MAX_FILENANE_LEN];
+	char share_file_name[MAX_FILE_LEN];
 	int share_file = -1;
 	sprintf(share_file_name, "%s%04d", D_P_SHARE, seq_PKT);
 	inc_seq_PKT(seq_PKT);
