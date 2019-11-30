@@ -3,13 +3,13 @@
 
 int main()
 {
-	prctl(PR_SET_NAME, receiver_physical);
+	prctl(PR_SET_NAME, "receiver_physical");
 	frame s;
 
 	/*建立套接字*/
 	int sockfd_server, sockfd_client;
 	struct sockaddr_in sock_addr;
-	if ((*sockfd_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	if ((sockfd_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("error from socket\n");
 		return;
 	}
