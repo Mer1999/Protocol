@@ -121,24 +121,21 @@ void to_physical_layer(frame *s);
 
 void from_datalink_layer(frame *s)
 {
-	static int seq_PKT = 0;//使用静态局部变量
+	static int seq_num = 1;
 	char share_file_name[MAX_FILE_LEN];
-	int share_file = -1;
-	sprintf(share_file_name, "%s%04d", D_P_SHARE, seq_PKT);
-	inc_seq_PKT(seq_PKT);
-	while (share_file == -1)
+	int fd = -1;
+	sprintf(share_file_name, "%s%04d", D_P_SHARE, seq_num);
+	inc(seq_num);
+	while (fd == -1)
 	{
-		share_file = open(share_file_name, O_RDONLY);
+		fd = open(share_file_name, O_RDONLY);
 	}
 	/*加锁，读取文件*/
-	set_lock(share_file, F_RDLCK);
+	set_lock(fd, F_RDLCK);
+	read(fd, s, sizeof(frame));
+	set_lock(fd, F_UNLCK);//读完开锁
 
-	read(share_file, s, sizeof(frame));
-
-	set_lock(share_file, F_UNLCK);//读完开锁
-
-	close(share_file);
-	/*向DATALINK_LAYER发送enable 信号分离出去 由enable_network_layer完成*/
+	close(fd);
 }
 
 /*------------------------------------------冕------------------------------------------*/
