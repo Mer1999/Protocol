@@ -34,6 +34,10 @@
 #define SIG_RECV_LINK_READ 	42	//recv物理层通知数据链路层读共享文件
 #define SIG_RECV_NET_READ 	43	//recv数据链路层通知网络层读共享文件
 
+#define DEFAULT_PORT 4000
+#define RIP "192.168.80.233"
+#define SIP "192.168.80.230"
+
 typedef enum {
 	false,		//false=0
 	true		//true=1
