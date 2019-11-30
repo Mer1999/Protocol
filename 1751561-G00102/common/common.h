@@ -16,8 +16,10 @@
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
 #define MAX_SEQ 9999 //共享文件名数字
-#define N_D_SHARE "nerwork_datalink_share."
-#define D_N_SHARE "datalink_network_share."
+#define N_D_SHARE "nerwork_datalink.share."
+#define D_N_SHARE "datalink_network.share."
+#define D_P_SHARE "datalink_physical.share."
+#define P_D_SHARE "physical_datalink.share."
 
 typedef enum {
 	false,		//false=0
