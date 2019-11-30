@@ -29,9 +29,18 @@ int inc_seq_num(int &seq_num)
 }
 
 
+int key_from_network_layer=0;//信号阻塞
+void key_from_network_layer_enable()//信号启用
+{
+	key_from_network_layer=1;
+}
+
 /*发送方从网络层得到纯数据包*/
 void from_network_layer(packet* p)
 {
+	while(key_from_physical_layer==0)();//信号阻塞
+	key_from_physical_layer=0;
+
 	static int seq_num=1;
 	int fd;
 	char share_filename[MAX_FILE_LEN];
@@ -108,7 +117,7 @@ void to_physical_layer(frame *s);
 	int pid=FindPidByName("./sender_physical");//获得网络层进程的pid
 	kill(pid,40);//发送信号让物理层读文件
 	printf("数据链路层已向物理层写入文件\n");
-}				
+}					
 
 /*------------------------------------------冕------------------------------------------*/
 static event_type e;
