@@ -185,10 +185,13 @@ void enable_network_layer()
 {
 	char buf[128] = { 0 };
 	FILE *fp = NULL;
-	fp = popen("ps -ef|grep _network|awk '{print $2}'", "r");//找到网络层进程的pid号，发送信号使用
-	fgets(buf, 127, fp);
-	pid_t pid;
-	pid = atoi(buf);
+	int pid;
+	if (getpid() == FindPidByName("./sender_datalink")) {
+		pid = FindPidByName("./sender_network");
+	}
+	else if (getpid() == FindPidByName("./receiver_datalink")) {
+		pid = FindPidByName("./receiver_network");
+	}
 	kill(pid, 38);
 }
 
@@ -196,10 +199,13 @@ void disable_network_layer()
 {
 	char buf[128] = { 0 };
 	FILE *fp = NULL;
-	fp = popen("ps -ef|grep _network|awk '{print $2}'", "r");//找到网络层进程的pid号，发送信号使用
-	fgets(buf, 127, fp);
-	pid_t pid;
-	pid = atoi(buf);
+	int pid;
+	if (getpid() == FindPidByName("./sender_datalink")) {
+		pid = FindPidByName("./sender_network");
+	}
+	else if (getpid() == FindPidByName("./receiver_datalink")) {
+		pid = FindPidByName("./receiver_network");
+	}
 	kill(pid, 39);
 }
 
