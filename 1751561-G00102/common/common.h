@@ -90,6 +90,8 @@ void disable_network_layer(void);
 int set_lock(int fd,int type) 
 
 
+
+//----------------------------------工具函数-------------------------
 void sysLocalTime() 
 { 
     time_t             timesec; 
@@ -114,6 +116,27 @@ void sysUsecTime()
     p = localtime(&tv.tv_sec); 
     printf("time_now:%d%d%d%d%d%d.%ld\n", 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, tv.tv_usec); 
 } 
+
+//读取pid 
+int FindPidByName(const char *pName)  
+{  
+    int szPid=-1;  
+  
+    char szProQuery[256];  
+    sprintf(szProQuery,"ps -ef|grep '%s'|grep -v 'grep'|awk '{print $2}'",pName);  // 打开管道,执行shell命令  
+  
+    FILE *fp=popen(szProQuery,"r");  
+    char szBuff[10];  
+  
+    while(fgets(szBuff,10,fp)!=NULL) // 逐行读取执行结果
+    {  
+        szPid=atoi(szBuff);  
+        break;  
+    }  
+  
+    pclose(fp); // 关闭管道指针,不是fclose()很容易混淆  
+    return szPid;  
+}  
 
 //-----------------------------链表实现---------------------------
 #define OK           1
