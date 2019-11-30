@@ -32,7 +32,7 @@ int inc_seq_num(int &seq_num)
 void from_network_layer(packet* p)
 {
 	static int seq_num=1;
-	int n_dfd;
+	int fd;
 	char share_filename[seq_num];
 	sprintf(share_filename,"%s%04d",N_D_SHARE,seq_num);
 	inc(seq_num);
@@ -40,7 +40,7 @@ void from_network_layer(packet* p)
 	set_lock(fd,F_RDLCK);
 	read(share_file,p->data,MAX_PKT);
 	set_lock(fd,F_UNLCK);
-	close(n_dfd);
+	close(fd);
 	printf("datalink receive from network successfully\n");
 }
 
@@ -48,11 +48,11 @@ void from_network_layer(packet* p)
 void to_network_layer(packet* p)
 {
 	static int seq_num=1;
-	char share_filename[seq_num];
+	char share_filename[MAX_FILE_LEN];
 	int d_nfd;
 	sprintf(share_filename,"%s%04d",D_N_SHARE,seq_num);
 	inc(seq_num);
-	fd=open(share_file_name,O_WRONLY|O_CREAT,0644);
+	d_nfd=open(share_file_name,O_WRONLY|O_CREAT,0644);
 	write(d_nfd,p->data,MAX_PKT);
 	close(d_nfd);
 }
