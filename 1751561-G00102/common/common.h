@@ -14,6 +14,7 @@
 #include <sys/errno.h>
 #include <signal.h>
 #include <sys/prctl.h>
+
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
 #define MAX_SEQ 9999 //共享文件名数字
@@ -21,6 +22,13 @@
 #define D_N_SHARE "datalink_network.share."
 #define D_P_SHARE "datalink_physical.share."
 #define P_D_SHARE "physical_datalink.share."
+
+#define SIG_ERR 		35	//chsum_err
+#define SIG_FRAME_ARRIVAL 	36	//frame_arrival
+#define SIG_NET_READY 		37	//network_layer_ready
+#define SIG_ENABLE_NET 		38	//enable_network_layer
+#define SIG_DISABLE_NET 	39	//disable_network_layer
+#define SIG_PHY_READ 		40	//数据链路层通知物理层读共享文件
 
 typedef enum {
 	false,		//false=0
