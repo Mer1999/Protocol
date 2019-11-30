@@ -11,7 +11,7 @@ static void EnPhy(int signo)
 
 int main()
 {
-	prctl(PR_SET_NAME, sender_physical);
+	prctl(PR_SET_NAME, "sender_physical");
 	/*注册信号处理函数*/
 	signal(SIG_PHY_READ, EnPhy);//可读信号到来
 
