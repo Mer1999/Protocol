@@ -44,13 +44,13 @@ int main()
 	int fd, seq_num = 0; 
 	int nlen = 0;
 	while (true) {
-		nlen = receive_from_phy(&s, sockfd_server, sockfd_client);
+		nlen = receive_from_phy(&s, sockfd_server, sockfd_client);//从另一端的物理层获取帧
 		if (nlen <= 0)break;
-		sprintf(share_file_name, "%s%04d", P_D_SHARE, seq_num);
+		sprintf(share_file_name, "%s%04d", P_D_SHARE, seq_num);//编辑需要打开的文件名
 		inc(seq_num);
 		fd = open(share_file_name, O_WRONLY | O_CREAT, 0644);
 		if (fd < 0)break;
-		write(fd, &s, sizeof(frame));
+		write(fd, &s, sizeof(frame));//向文件中写入帧
 		int pid = FindPidByName("./receiver_datalink");//获得链路层进程的pid
 		kill(pid, 42);//发送信号让链路层层读文件
 		close(fd);
