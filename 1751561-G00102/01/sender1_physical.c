@@ -11,13 +11,13 @@ static void EnPhy(int signo)
 
 int main()
 {
+	prctl(PR_SET_NAME, sender_physical);
 	/*注册信号处理函数*/
 	signal(SIG_PHY_READ, EnPhy);//可读信号到来
 
 	 frame s;
-	 packet buffer;
 
-	 /*建立套接字连接*/
+	 /*建立套接字*/
 	 int sockfd;
 	 int n;
 	 struct sockaddr_in sock_addr;
@@ -43,4 +43,6 @@ int main()
 
 		 r_en = 0;
 	 }
+
+	 return 0;
 }
