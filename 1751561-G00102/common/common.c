@@ -111,6 +111,7 @@ void to_physical_layer(frame *s)
 	printf("数据链路层已向物理层写入文件\n");
 }
 
+/*物理层读取链路层*/
 void from_datalink_layer(frame *s)
 {
 	static int seq_num = 1;
@@ -134,9 +135,9 @@ void from_datalink_layer(frame *s)
 /*物理层之间传输*/
 void send_to_phy(frame *s,int sockfd)
 {
-	if (s->kind == nak || s->kind == ack)
+	if (s->kind == nak || s->kind == ack)//ack或者nak帧传12字节
 		write(sockfd, s, FRAMEHEAD);
-	else
+	else//数据帧传1036字节
 		write(sockfd, s, sizeof(frame));
 }
 
@@ -178,10 +179,10 @@ void enable_network_layer()
 	char buf[128] = { 0 };
 	FILE *fp = NULL;
 	int pid;
-	if (getpid() == FindPidByName("./sender_datalink")) {
+	if (getpid() == FindPidByName("./sender_datalink")) {//如果是sender方的信号，则发给sender方
 		pid = FindPidByName("./sender_network");
 	}
-	else if (getpid() == FindPidByName("./receiver_datalink")) {
+	else if (getpid() == FindPidByName("./receiver_datalink")) {//如果是receiver方的信号，则发给receiver方
 		pid = FindPidByName("./receiver_network");
 	}
 	kill(pid, 38);
@@ -192,10 +193,10 @@ void disable_network_layer()
 	char buf[128] = { 0 };
 	FILE *fp = NULL;
 	int pid;
-	if (getpid() == FindPidByName("./sender_datalink")) {
+	if (getpid() == FindPidByName("./sender_datalink")) {//如果是sender方的信号，则发给sender方
 		pid = FindPidByName("./sender_network");
 	}
-	else if (getpid() == FindPidByName("./receiver_datalink")) {
+	else if (getpid() == FindPidByName("./receiver_datalink")) {//如果是receiver方的信号，则发给receiver方
 		pid = FindPidByName("./receiver_network");
 	}
 	kill(pid, 39);
