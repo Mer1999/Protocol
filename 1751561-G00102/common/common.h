@@ -90,6 +90,8 @@ void to_physical_layer(frame* s);
 void from_datalink_layer(frame *s);
 /*物理层间传输*/
 void send_to_phy(frame *s, int sockfd);
+/*物理层间接收*/
+int receive_from_phy(frame *s, int sockfd_server,int sockfd_client);
 /*启动第k帧的定时器*/
 void start_timer(seq_nr k);
 /*停止第k帧的定时器*/
