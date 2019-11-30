@@ -28,12 +28,13 @@ int inc_seq_num(int &seq_num)
 	return seq_num;
 }
 
+
 /*发送方从网络层得到纯数据包*/
 void from_network_layer(packet* p)
 {
 	static int seq_num=1;
 	int fd;
-	char share_filename[seq_num];
+	char share_filename[MAX_FILE_LEN];
 	sprintf(share_filename,"%s%04d",N_D_SHARE,seq_num);
 	inc(seq_num);
 	fd=open(share_filename,O_RDONLY);
@@ -41,6 +42,8 @@ void from_network_layer(packet* p)
 	read(share_file,p->data,MAX_PKT);
 	set_lock(fd,F_UNLCK);
 	close(fd);
+	int pid=FindPidByName("./sender_network");//获得网络层进程的pid
+	kill(pid,40);//发送40号信号
 	printf("datalink receive from network successfully\n");
 }
 
@@ -57,9 +60,55 @@ void to_network_layer(packet* p)
 	close(d_nfd);
 }
 
-void from_physical_layer(packet* p);	
+/*接收方从物理层取得帧，调用本函数前已验证过校验和，若发生错误,则发送cksum_err事件
+因此只有帧正确的情况下会调用本函数*/
+int key_from_physical_layer=0;//信号阻塞
+void key_from_physical_layer_enable()//信号启用
+{
+	key_from_physical_layer=1;
+}
 
-void to_physical_layer(frame *s);			
+void from_physical_layer(frame* s);
+{
+	while(key_from_physical_layer==0)();//信号阻塞
+	key_from_physical_layer=0;
+
+	static int seq_num=1;
+	int fd;
+	char share_filename[seq_num];
+	sprintf(share_filename,"%s%04d",P_D_SHARE,seq_num);
+	inc(seq_num);//读取文件序号+1
+	fd=open(share_filename,O_RDONLY);//打开文件
+	set_lock(fd,F_RDLCK);//设置文件锁
+	read(fd,*(s->kind),4);//帧类型
+	read(fd,*(s->seq),4);//发送序号
+	read(fd,*(s->ack),4);//接收序号
+	if (s->kind==frame_kind)read(fd,s->info->data,MAX_PKT);//数据包
+	set_lock(fd,F_UNLCK);//解开文件锁
+	close(fd);
+	printf("数据链路层已从物理层读入帧数据\n");
+}	
+
+/*发送方向物理层发送帧*/
+void to_physical_layer(frame *s);
+{
+	static int seq_num=1;
+	char share_filename[MAX_FILE_LEN];//写入文件名
+	int fd;
+	sprintf(share_filename,"%s%04d",D_P_SHARE,s->);//文件名
+	inc(seq_num);//文件序号+1
+	fd=open(share_file_name,O_WRONLY|O_CREAT,0644);//打开文件
+	set_lock(fd,F_RDLCK);//设置文件锁
+	write(fd,*(s->kind),4);//帧类型
+	write(fd,*(s->seq),4);//发送序号
+	write(fd,*(s->ack),4);//接收序号
+	if (s->kind==frame_kind)write(fd,s->info->data,MAX_PKT);//数据包写数据
+	set_lock(fd,F_UNLCK);//解开文件锁
+	close(fd);//关文件
+	int pid=FindPidByName("./sender_physical");//获得网络层进程的pid
+	kill(pid,40);//发送信号让物理层读文件
+	printf("数据链路层已向物理层写入文件\n");
+}				
 
 /*------------------------------------------冕------------------------------------------*/
 static event_type e;
