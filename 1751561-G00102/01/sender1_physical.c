@@ -38,8 +38,8 @@ int main()
 	 while (true) {
 		 if (r_en == 0)continue;
 
-		 from_datalink_layer(&s);
-		 send_to_phy(&s, sockfd);
+		 from_datalink_layer(&s);//从链路层读帧
+		 send_to_phy(&s, sockfd);//向另一个物理层写帧
 
 		 r_en = 0;
 	 }
