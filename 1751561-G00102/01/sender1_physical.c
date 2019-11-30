@@ -1,7 +1,7 @@
 #include "../common/common.h"
 //#include "common.h"
 
-static int r_en = 0//为可读信号，链路层写完文件发送信号告知物理层可读取，此时r_en由0变1，读完再变回0
+static int r_en = 0;//为可读信号，链路层写完文件发送信号告知物理层可读取，此时r_en由0变1，读完再变回0
 static void EnPhy(int signo)
 {
 	r_en = 1;
