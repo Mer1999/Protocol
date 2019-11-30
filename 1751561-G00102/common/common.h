@@ -28,7 +28,10 @@
 #define SIG_NET_READY 		37	//network_layer_ready
 #define SIG_ENABLE_NET 		38	//enable_network_layer
 #define SIG_DISABLE_NET 	39	//disable_network_layer
-#define SIG_PHY_READ 		40	//数据链路层通知物理层读共享文件
+#define SIG_SEND_PHY_READ 	40	//send数据链路层通知物理层读共享文件
+#define SIG_SEND_LINK_READ 	41	//send网络层通知数据链路层读共享文件
+#define SIG_RECV_LINK_READ 	42	//recv物理层通知数据链路层读共享文件
+#define SIG_RECV_NET_READ 	43	//recv数据链路层通知网络层读共享文件
 
 typedef enum {
 	false,		//false=0
