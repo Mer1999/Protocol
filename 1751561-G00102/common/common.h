@@ -14,6 +14,7 @@
 #include <sys/errno.h>
 #include <signal.h>
 #include <sys/prctl.h>
+#include <sys/time.h>
 
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
@@ -114,7 +115,8 @@ void disable_network_layer(void);
 #define inc(k) if(k<MAX_SEQ) k=k+1; else k=1;
 /*文件锁设置*/
 int set_lock(int fd, int type);
-
+/*写日志*/
+void writelog(char*msg)
 /*读取pid*/
 int FindPidByName(const char *pName);
 
