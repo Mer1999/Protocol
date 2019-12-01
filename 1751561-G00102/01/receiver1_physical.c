@@ -10,7 +10,7 @@ int main(int argc,char* argv[])
 	int sockfd_server, sockfd_client;
 	struct sockaddr_in sock_addr;
 	if ((sockfd_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		wirtelog("error from receiver socket\n");
+		writelog("error from receiver socket\n");
 		return;
 	}
 
@@ -21,17 +21,17 @@ int main(int argc,char* argv[])
 
 	unsigned int value = 1;
 	if (setsockopt(sockfd_server, SOL_SOCKET, SO_REUSEADDR, (void*)&value, sizeof(value)) < 0) {
-		wirtelog("error from receiver setsockopt\n");
+		writelog("error from receiver setsockopt\n");
 		return;
 	}
 
 	if (bind(sockfd_server, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) == -1) {
-		wirtelog("error from bind\n");
+		writelog("error from bind\n");
 		return;
 	}
 
 	if (listen(sockfd_server, 10) == -1) {
-		wirtelog("error from listen\n");
+		writelog("error from listen\n");
 		return;
 	}
 
