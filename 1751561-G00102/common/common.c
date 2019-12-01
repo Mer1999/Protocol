@@ -26,6 +26,7 @@ void key_from_network_layer_enable()//信号启用
 {
 	key_from_network_layer = 1;
 }
+
 /*发送方从网络层得到纯数据包*/
 void from_network_layer(packet* p)
 {
@@ -45,7 +46,7 @@ void from_network_layer(packet* p)
 	int pid;
 	while((pid=FindPidByName("sender_network"))==-1);//获取网络pid
 	kill(pid, SIG_ENABLE_NET);//通知网络层可以继续写了
-	writelog("datalink receive from network successfully\n");
+	writelog("SDL:datalink receive from network successfully\n");
 }
 
 /*接收方向网络层发送纯数据包*/
@@ -63,7 +64,7 @@ void to_network_layer(packet* p)
 	while((pid=FindPidByName("receiver_network"))==-1);//获得网络层进程的pid
 	sleep(1);
 	kill(pid, SIG_RECV_NET_READ);//recv数据链路层通知网络层读共享文件
-	writelog("datalink write to network successfully\n");
+	writelog("RDL:datalink write to network successfully\n");
 }
 
 /*接收方从物理层取得帧，调用本函数前已验证过校验和，若发生错误,则发送cksum_err事件
@@ -90,14 +91,23 @@ void from_physical_layer(frame* s)
 	set_lock(fd, F_UNLCK);//解开文件锁
 	close(fd);
 	while((pid=FindPidByName("receiver_physical"))==-1);//获取物理层pid
-	kill(pid, SIG_RECV_PHY_WRITE);//发送信号让物理层读文件
+	kill(pid, SIG_RECV_PHY_WRITE);//发送信号让物理层写文件
 
-	writelog("datalink receive from physical successfully\n");
+	writelog("RDL:datalink receive from physical successfully\n");
 }
 
 /*发送方向物理层发送帧*/
+
+int key_to_physical_layer = 1;//信号阻塞
+void key_to_physical_layer_enable()//信号启用
+{
+	key_to_physical_layer = 1;
+}
 void to_physical_layer(frame *s)
 {
+	while (key_to_physical_layer == 0){};//信号阻塞
+	key_to_physical_layer = 0;
+
 	static int seq_num = 1;
 	char share_filename[MAX_FILE_LEN];//写入文件名
 	int fd;
@@ -115,7 +125,7 @@ void to_physical_layer(frame *s)
 	int pid;
 	while((pid=FindPidByName("sender_physical"))==-1);//获取物理层pid
 	kill(pid, SIG_SEND_PHY_READ);//发送信号让物理层读文件
-	writelog("datalink write to physical successfully\n");
+	writelog("SDL:datalink write to physical successfully\n");
 }
 
 /*物理层读取链路层*/
@@ -123,7 +133,7 @@ void from_datalink_layer(frame *s)
 {
 	static int seq_num = 1;
 	char share_file_name[MAX_FILE_LEN];
-	int fd = -1;
+	int fd = -1,pid;
 	sprintf(share_file_name, "%s%04d", D_P_SHARE, seq_num);
 	inc(seq_num);
 	while (fd == -1)
@@ -134,8 +144,11 @@ void from_datalink_layer(frame *s)
 	set_lock(fd, F_RDLCK);
 	read(fd, s, sizeof(frame));
 	set_lock(fd, F_UNLCK);//读完开锁
-
 	close(fd);
+	while((pid=FindPidByName("sender_datalink"))==-1);//获取链路层pid
+	kill(pid, SIG_SEND_LINK_WRITE);//发送信号让链路层写文件
+	writelog("SDL:physical receive from datalink successfully\n");
+	
 }
 
 /*写日志*/
@@ -198,9 +211,9 @@ static void NLReady()
 void wait_for_event(event_type* event)
 {
 	signal(SIGALRM, TIMEOUT);
-	signal(SIG_CHSUM_ERR , CksumErr);
-	signal(SIG_FRAME_ARRIVAL, FrameArrival);
-	signal(SIG_NET_READY, NLReady);
+	signal(35, CksumErr);
+	signal(36, FrameArrival);
+	signal(37, NLReady);
 	pause();
 	*event = e;
 	return;
