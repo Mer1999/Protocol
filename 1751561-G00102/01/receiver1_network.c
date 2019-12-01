@@ -1,17 +1,18 @@
 #include"../common/common.h"
 
-static int ena = 0;//收到链路层读信号则置1
+static int ena = 1;//收到链路层读信号则置1
 
 static void read_network(int sig)
 {
-    signal(SIG_RECV_NET_READ, read_network);
     ena = 1;
 }
 
 
-int main(int argc,char* argv[])
+int main(int argc,char *argv[])
 {
-	sprintf(argv[0],"receiver_network");//修改进程名
+    signal(SIG_RECV_NET_READ, read_network);
+    sprintf(argv[0],"receiver_network");
+	prctl(PR_SET_NAME, "receiver_network");
 	char buffer[2][MAX_PKT+1];//一个缓冲区(存倒数第二个)一个接收区(最新的)
     memset(buffer[0], '\0', MAX_PKT + 1);
     memset(buffer[1], '\0', MAX_PKT + 1);
@@ -30,11 +31,12 @@ int main(int argc,char* argv[])
     	perror("open file");
     	exit(-1);
     }
-
     while(1)
     {
+        //sleep(1);
     	if(ena)//进行读操作
     	{
+            //ena=0;
     		lastbuf=bufnum;
     		bufnum=1-bufnum;
     		sprintf(filename, "%s%04d", D_N_SHARE, filenum);//组合共享文件名
@@ -56,6 +58,7 @@ int main(int argc,char* argv[])
     				break;
     			}
     		}
+            printf("2");
     		if(isend)
     		{
     			lastPKTsize=0;
