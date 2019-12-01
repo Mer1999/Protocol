@@ -3,25 +3,24 @@ static int ena = 1;                  //enable|disable
 
 static void enable_network(int sig)
 {
-  signal(SIG_ENABLE_NET, enable_network);
   ena=1;
 }
 static void disable_network(int sig)
 {
-  signal(SIG_DISABLE_NET, disable_network);
   ena=0;
 }
 
-int main()
+int main(int argc,char *argv[])
 {
+    sprintf(argv[0],"sender_network");
    prctl(PR_SET_NAME, "sender_network");
-   signal(SIG_ENABLE_NET, enable_network); //38
-   signal(SIG_DISABLE_NET, disable_network); //39
+   signal(SIG_ENABLE_NET, enable_network);//38
+   signal(SIG_DISABLE_NET, disable_network);//39
    char buffer[MAX_PKT + 1] = { 0 };//存储文件中读取的数据
    FILE* fp = fopen("test.txt", "r");//打开文件进行读
    if (fp == NULL)//文件打开失败
    {
-      writelog("sender1_network_layer open file fail,exit -1\n");
+      perror("open file");
       exit(-1);
    }
    int realread = 0;             //fread返回值，实际读取到的字符数
@@ -31,6 +30,7 @@ int main()
    char filename[MAX_FILE_LEN];  //共享文件名
    seq_nr filenum = 1;           //共享文件序号
    int lock=0;
+   int pid;
    while (keepread)
    {
       
@@ -46,7 +46,6 @@ int main()
          {
             for (i = realread; i < MAX_PKT; i++)
                buffer[i] = '\0';
-            writelog("sender1_network_layer read file finish\n");
          }
          if (!realread)//最后一次循环，将keepread置零
             keepread = 0;
@@ -63,8 +62,8 @@ int main()
          flock(fd,LOCK_EX);
          write(fd, buffer, MAX_PKT);//将buffer内容写入共享文件
          flock(fd,LOCK_UN);
-         
-         int pid=FindPidByName("./sender_datalink");
+         while((pid=FindPidByName("sender_datalink"))==-1);
+         printf("%d",pid);
          kill(pid,41);//通知链路层读共享文件
          
       }
@@ -74,7 +73,6 @@ int main()
         if(lock)
         {
           flock(fd,LOCK_UN);
-          
           lock=0;
         }
         close(fd);
