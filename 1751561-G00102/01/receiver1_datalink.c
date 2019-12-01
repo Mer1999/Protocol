@@ -2,6 +2,7 @@
   
 int main()
 {
+    prctl(PR_SET_NAME, "receiver_datalink");
   frame r;
   event_type event;
   //物理层通知读文件的信号
