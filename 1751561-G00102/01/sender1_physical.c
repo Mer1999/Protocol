@@ -22,7 +22,7 @@ int main(int argc,char* argv[])
 	 int n;
 	 struct sockaddr_in sock_addr;
 	 if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		 printf("error from socket\n");
+		 writelog("error from sender socket\n");
 		 return;
 	 }
 	 memset(&sock_addr, 0, sizeof(sock_addr));
@@ -33,6 +33,7 @@ int main(int argc,char* argv[])
 	 while (connect(sockfd, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
 		 continue;
 	 }
+	 writelog("connect to receiver successfully\n");
 
 	 /*传输文件*/
 	 while (true) {
