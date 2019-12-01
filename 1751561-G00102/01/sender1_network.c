@@ -15,13 +15,13 @@ static void disable_network(int sig)
 int main()
 {
    prctl(PR_SET_NAME, "sender_network");
-   signal(SIG_ENABLE_NET, enable_network);//38
-   signal(SIG_DISABLE_NET, disable_network);//39
+   signal(SIG_ENABLE_NET, enable_network); //38
+   signal(SIG_DISABLE_NET, disable_network); //39
    char buffer[MAX_PKT + 1] = { 0 };//存储文件中读取的数据
    FILE* fp = fopen("test.txt", "r");//打开文件进行读
    if (fp == NULL)//文件打开失败
    {
-      perror("open file");
+      writelog("sender1_network_layer open file fail,exit -1\n");
       exit(-1);
    }
    int realread = 0;             //fread返回值，实际读取到的字符数
@@ -46,6 +46,7 @@ int main()
          {
             for (i = realread; i < MAX_PKT; i++)
                buffer[i] = '\0';
+            writelog("sender1_network_layer read file finish\n");
          }
          if (!realread)//最后一次循环，将keepread置零
             keepread = 0;
@@ -73,6 +74,7 @@ int main()
         if(lock)
         {
           flock(fd,LOCK_UN);
+          
           lock=0;
         }
         close(fd);
