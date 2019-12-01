@@ -192,9 +192,9 @@ static void NLReady()
 void wait_for_event(event_type* event)
 {
 	signal(SIGALRM, TIMEOUT);
-	signal(35, CksumErr);
-	signal(36, FrameArrival);
-	signal(37, NLReady);
+	signal(SIG_CHSUM_ERR , CksumErr);
+	signal(SIG_FRAME_ARRIVAL, FrameArrival);
+	signal(SIG_NET_READY, NLReady);
 	pause();
 	*event = e;
 	return;
