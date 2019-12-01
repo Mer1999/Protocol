@@ -2,6 +2,7 @@
   
 int main()
 {
+      prctl(PR_SET_NAME, "sender_datalink");
   frame s;
   packet buffer;
   //网络层通知读文件的信号
