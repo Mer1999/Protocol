@@ -24,3 +24,4 @@ clean:
 	rm -fr datalink_network.share.*
 	rm -fr datalink_physical.share.*
 	rm -fr physical_datalink.share.*
+	rm -fr protocol.log
