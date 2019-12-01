@@ -9,9 +9,9 @@ static void read_network(int sig)
 }
 
 
-int main()
+int main(int argc,char* argv[])
 {
-	prctl(PR_SET_NAME, "receiver_network");
+	sprintf(argv[0],"receiver_network");//修改进程名
 	char buffer[2][MAX_PKT+1];//一个缓冲区(存倒数第二个)一个接收区(最新的)
     memset(buffer[0], '\0', MAX_PKT + 1);
     memset(buffer[1], '\0', MAX_PKT + 1);
