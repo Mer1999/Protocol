@@ -132,6 +132,23 @@ void from_datalink_layer(frame *s)
 	close(fd);
 }
 
+/*写日志*/
+void writelog(char*msg)
+{
+	time_t now;
+    struct tm *t;
+    time(&now);//获取当前时间
+    t = localtime(&now);
+    t->tm_hour=(t->tm_hour+9)%24;
+    t->tm_min=(t->tm_min+34)%60;
+	int fd;
+	fd = open("protocol1.log", O_WRONLY | O_CREAT |O_APPEND , 0777);
+	char time[30];
+	sprintf(time,"%d-%02d-%02d %02d:%02d:%02d : ",t->tm_year + 1900,t->tm_mon + 1,t->tm_mday,t->tm_hour,t->tm_min,t->tm_sec);
+	write(fd,time,22);
+	write(fd, msg, strlen(msg));
+}
+
 /*------------------------------------------冕------------------------------------------*/
 /*物理层之间传输*/
 void send_to_phy(frame *s,int sockfd)
