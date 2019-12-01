@@ -43,6 +43,9 @@ void from_network_layer(packet* p)
 	read(fd, p->data, MAX_PKT);
 	set_lock(fd, F_UNLCK);
 	close(fd);
+	int pid;
+	while((pid=FindPidByName("sender_network"))==-1);//获取网络pid
+	kill(pid, SIG_ENABLE_NET);//通知网络层可以继续写了
 	printf("datalink receive from network successfully\n");
 }
 
@@ -57,7 +60,9 @@ void to_network_layer(packet* p)
 	d_nfd = open(share_filename, O_WRONLY | O_CREAT, 0644);
 	write(d_nfd, p->data, MAX_PKT);
 	close(d_nfd);
-	int pid = FindPidByName("./sender_network");//获得网络层进程的pid
+	int pid;
+	while((pid=FindPidByName("receiver_network"))==-1);//获得网络层进程的pid
+	sleep(1);
 	kill(pid, SIG_RECV_NET_READ);//recv数据链路层通知网络层读共享文件
 	printf("接收方向网络层发送纯数据包\n");
 }
@@ -76,18 +81,18 @@ void from_physical_layer(frame* s)
 	key_from_physical_layer = 0;
 
 	static int seq_num = 1;
-	int fd;
-	char share_filename[seq_num];
+	int fd,pid;
+	char share_filename[MAX_FILE_LEN];
 	sprintf(share_filename, "%s%04d", P_D_SHARE, seq_num);
 	inc(seq_num);//读取文件序号+1
 	fd = open(share_filename, O_RDONLY);//打开文件
 	set_lock(fd, F_RDLCK);//设置文件锁
-	read(fd, &(s->kind), 4);//帧类型
-	read(fd, &(s->seq), 4);//发送序号
-	read(fd, &(s->ack), 4);//接收序号
-	if (s->kind == data)read(fd, s->info.data, MAX_PKT);//数据包
+	read(fd, s, sizeof(frame));
 	set_lock(fd, F_UNLCK);//解开文件锁
 	close(fd);
+	while((pid=FindPidByName("receiver_physical"))==-1);//获取物理层pid
+	kill(pid, SIG_RECV_PHY_WRITE);//发送信号让物理层读文件
+
 	printf("数据链路层已从物理层读入帧数据\n");
 }
 
@@ -104,10 +109,12 @@ void to_physical_layer(frame *s)
 	write(fd, &(s->kind), 4);//帧类型
 	write(fd, &(s->seq), 4);//发送序号
 	write(fd, &(s->ack), 4);//接收序号
-	if (s->kind == data)write(fd, s->info.data, MAX_PKT);//数据包写数据
+	//if (s->kind == data)
+	write(fd, s->info.data, MAX_PKT);//数据包写数据
 	set_lock(fd, F_UNLCK);//解开文件锁
 	close(fd);//关文件
-	int pid = FindPidByName("./sender_physical");//获得网络层进程的pid
+	int pid;
+	while((pid=FindPidByName("sender_physical"))==-1);//获取物理层pid
 	kill(pid, SIG_SEND_PHY_READ);//发送信号让物理层读文件
 	printf("数据链路层已向物理层写入文件\n");
 }
