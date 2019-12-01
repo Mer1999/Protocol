@@ -43,8 +43,6 @@ void from_network_layer(packet* p)
 	read(fd, p->data, MAX_PKT);
 	set_lock(fd, F_UNLCK);
 	close(fd);
-	int pid = FindPidByName("./sender_network");//获得网络层进程的pid
-	kill(pid, 40);//发送40号信号
 	printf("datalink receive from network successfully\n");
 }
 
@@ -59,6 +57,9 @@ void to_network_layer(packet* p)
 	d_nfd = open(share_filename, O_WRONLY | O_CREAT, 0644);
 	write(d_nfd, p->data, MAX_PKT);
 	close(d_nfd);
+	int pid = FindPidByName("./sender_network");//获得网络层进程的pid
+	kill(pid, SIG_RECV_NET_READ);//recv数据链路层通知网络层读共享文件
+	printf("接收方向网络层发送纯数据包\n");
 }
 
 /*接收方从物理层取得帧，调用本函数前已验证过校验和，若发生错误,则发送cksum_err事件
@@ -107,7 +108,7 @@ void to_physical_layer(frame *s)
 	set_lock(fd, F_UNLCK);//解开文件锁
 	close(fd);//关文件
 	int pid = FindPidByName("./sender_physical");//获得网络层进程的pid
-	kill(pid, 40);//发送信号让物理层读文件
+	kill(pid, SIG_SEND_PHY_READ);//发送信号让物理层读文件
 	printf("数据链路层已向物理层写入文件\n");
 }
 
