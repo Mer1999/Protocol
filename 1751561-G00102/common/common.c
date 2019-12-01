@@ -26,7 +26,6 @@ void key_from_network_layer_enable()//信号启用
 {
 	key_from_network_layer = 1;
 }
-
 /*发送方从网络层得到纯数据包*/
 void from_network_layer(packet* p)
 {
@@ -46,7 +45,7 @@ void from_network_layer(packet* p)
 	int pid;
 	while((pid=FindPidByName("sender_network"))==-1);//获取网络pid
 	kill(pid, SIG_ENABLE_NET);//通知网络层可以继续写了
-	printf("datalink receive from network successfully\n");
+	writelog("datalink receive from network successfully\n");
 }
 
 /*接收方向网络层发送纯数据包*/
@@ -64,7 +63,7 @@ void to_network_layer(packet* p)
 	while((pid=FindPidByName("receiver_network"))==-1);//获得网络层进程的pid
 	sleep(1);
 	kill(pid, SIG_RECV_NET_READ);//recv数据链路层通知网络层读共享文件
-	printf("接收方向网络层发送纯数据包\n");
+	writelog("datalink write to network successfully\n");
 }
 
 /*接收方从物理层取得帧，调用本函数前已验证过校验和，若发生错误,则发送cksum_err事件
@@ -93,7 +92,7 @@ void from_physical_layer(frame* s)
 	while((pid=FindPidByName("receiver_physical"))==-1);//获取物理层pid
 	kill(pid, SIG_RECV_PHY_WRITE);//发送信号让物理层读文件
 
-	printf("数据链路层已从物理层读入帧数据\n");
+	writelog("datalink receive from physical successfully\n");
 }
 
 /*发送方向物理层发送帧*/
@@ -116,7 +115,7 @@ void to_physical_layer(frame *s)
 	int pid;
 	while((pid=FindPidByName("sender_physical"))==-1);//获取物理层pid
 	kill(pid, SIG_SEND_PHY_READ);//发送信号让物理层读文件
-	printf("数据链路层已向物理层写入文件\n");
+	writelog("datalink write to physical successfully\n");
 }
 
 /*物理层读取链路层*/
