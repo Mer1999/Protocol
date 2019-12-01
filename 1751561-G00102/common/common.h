@@ -117,7 +117,7 @@ void disable_network_layer(void);
 /*文件锁设置*/
 int set_lock(int fd, int type);
 /*写日志*/
-void writelog(char*msg)
+void writelog(char*msg);
 /*读取pid*/
 int FindPidByName(const char *pName);
 
