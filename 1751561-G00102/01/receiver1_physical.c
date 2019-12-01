@@ -1,9 +1,9 @@
 #include "../common/common.h"
 //#include "common.h"
 
-int main()
+int main(int argc,char* argv[])
 {
-	prctl(PR_SET_NAME, "receiver_physical");
+	sprintf(argv[0],"receiver_physical");//修改进程名
 	frame s;
 
 	/*建立套接字*/
