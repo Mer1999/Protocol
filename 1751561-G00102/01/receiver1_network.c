@@ -23,7 +23,7 @@ int main()
     int isend=1;//判断是否为最后一个包
     int i;//工具人
     int lastPKTsize=0;//最后一个包大小
-    int fd=open("receive.txt",O_WRONLY|O_CREAT,0777);
+    int fd=open("receive.txt",O_WRONLY|O_CREAT|O_APPEND,0777);
     int firstbuf=1;
     if(fd==-1)
     {
