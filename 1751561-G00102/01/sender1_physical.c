@@ -9,9 +9,9 @@ static void EnPhy(int signo)
 
 
 
-int main()
+int main(int argc,char* argv[])
 {
-	prctl(PR_SET_NAME, "sender_physical");
+	sprintf(argv[0],"sender_physical");//修改进程名
 	/*注册信号处理函数*/
 	signal(SIG_SEND_PHY_READ, EnPhy);//可读信号到来
 
