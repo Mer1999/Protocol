@@ -1,20 +1,19 @@
 #pragma once
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <signal.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/errno.h>
-#include <sys/file.h>  
-#include <sys/prctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h> 
-#include <sys/time.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/file.h>  
+#include <sys/stat.h> 
+#include <netinet/in.h>
+#include <sys/errno.h>
+#include <signal.h>
+#include <sys/prctl.h>
 
 #define MAX_PKT 1024 //每一帧最大容量
 #define MAX_FILE_LEN 128 //最大共享文件名长度
@@ -34,10 +33,13 @@
 #define SIG_SEND_LINK_READ 	41	//send网络层通知数据链路层读共享文件
 #define SIG_RECV_LINK_READ 	42	//recv物理层通知数据链路层读共享文件
 #define SIG_RECV_NET_READ 	43	//recv数据链路层通知网络层读共享文件
-#define SIG_RECV_PHY_WRITE 	44	//recv数据链路层通知网络层读共享文件
+
+#define SIG_SEND_LINK_WRITE 44	//send物理层通知数据链路层写共享文件
+#define SIG_RECV_PHY_WRITE 	45	//recv数据链路层通知物理层写共享文件
+#define SIG_RECV_LINK_WRITE 46	//recv网络层通知数据链路层写共享文件
 
 #define DEFAULT_PORT 4000
-#define RIP "192.168.80.233"
+#define RIP "192.168.80.231"
 #define SIP "192.168.80.230"
 
 typedef enum {
@@ -89,6 +91,7 @@ void to_network_layer(packet* p);
 void key_from_physical_layer_enable();//信号启用
 void from_physical_layer(frame* s);
 /*发送方向物理层发送帧,帧头尾加FLAG字节、数据中进行字节填充,计算校验和放入帧尾*/
+void key_to_physical_layer_enable();//信号启用
 void to_physical_layer(frame* s);
 /*物理层读取链路层*/
 void from_datalink_layer(frame *s);
